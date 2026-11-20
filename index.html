@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>🔒</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300&family=Inter:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .lucchetto {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+  .lucchetto form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(320px, 100%);
+    text-align: center;
+  }
+  .lucchetto h1 {
+    margin: 0 0 8px;
+    font-family: Fraunces, Georgia, serif;
+    font-weight: 300;
+    font-size: 40px;
+  }
+  .lucchetto input,
+  .lucchetto button {
+    padding: 12px 14px;
+    border-radius: 10px;
+    font: inherit;
+  }
+  .lucchetto input {
+    border: 1px solid #3ddc8455;
+    background: var(--card);
+    color: var(--ink);
+    text-align: center;
+  }
+  .lucchetto button {
+    border: 0;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .lucchetto p {
+    margin: 0;
+    min-height: 1.4em;
+    color: var(--muted);
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+  <div class="lucchetto">
+    <form id="sblocca">
+      <h1>🔒</h1>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" autofocus>
+      <button>Entra</button>
+      <p id="stato"></p>
+    </form>
+  </div>
+  <script src="sblocca.js"></script>
+</body>
+</html>
