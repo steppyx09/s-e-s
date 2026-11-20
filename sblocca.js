@@ -1,56 +1,45 @@
-const stato = document.getElementById('stato');
+const note = document.getElementById('status');
 
-document.getElementById('sblocca').onsubmit = async e => {
+document.getElementById('gate').onsubmit = async e => {
   e.preventDefault();
-  stato.textContent = 'Apro…';
+  note.textContent = 'Apro…';
 
-  const { sale, giri } = await (await fetch('dati/sale.json')).json();
-  const testo = new TextEncoder().encode(document.getElementById('password').value);
-  const base = await crypto.subtle.importKey('raw', testo, 'PBKDF2', false, ['deriveKey']);
-  const chiave = await crypto.subtle.deriveKey(
-    { name: 'PBKDF2', salt: Uint8Array.from(atob(sale), c => c.charCodeAt(0)), iterations: giri, hash: 'SHA-256' },
-    base, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+  const { salt, rounds } = await (await fetch('vault/salt.json')).json();
+  const secret = new TextEncoder().encode(document.getElementById('password').value);
+  const seed = await crypto.subtle.importKey('raw', secret, 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey(
+    { name: 'PBKDF2', salt: Uint8Array.from(atob(salt), c => c.charCodeAt()), iterations: rounds, hash: 'SHA-256' },
+    seed, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
 
-  async function decifra(file) {
-    const dati = new Uint8Array(await (await fetch('dati/' + file)).arrayBuffer());
-    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: dati.slice(0, 12) }, chiave, dati.slice(12));
-  }
+  const unseal = async file => {
+    const bytes = new Uint8Array(await (await fetch(`vault/${file}`)).arrayBuffer());
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes.subarray(0, 12) }, key, bytes.subarray(12));
+  };
 
-  let elenco;
-  try {
-    elenco = JSON.parse(new TextDecoder().decode(await decifra('elenco.bin')));
-  } catch {
-    stato.textContent = 'Password sbagliata';
-    return;
-  }
+  const book = await unseal('index.bin').then(raw => JSON.parse(new TextDecoder().decode(raw)), () => null);
+  if (!book) return void (note.textContent = 'Password sbagliata');
 
-  let fatte = 0;
-  const totale = elenco.foto.length + elenco.decoro.length + 3;
-  async function url({ file, tipo }) {
-    const blob = new Blob([await decifra(file)], { type: tipo });
-    stato.textContent = `Sblocco ${++fatte}/${totale}`;
-    return URL.createObjectURL(blob);
-  }
+  let done = 0;
+  const total = book.photos.length + book.decor.length + 3;
+  const link = async ({ file, type }) => {
+    const url = URL.createObjectURL(new Blob([await unseal(file)], { type }));
+    note.textContent = `Sblocco ${++done}/${total}`;
+    return url;
+  };
 
-  const [sfondo, tlou, mele, foto, decoro] = await Promise.all([
-    url(elenco.sfondo),
-    url(elenco.tlou),
-    url(elenco.mele),
-    Promise.all(elenco.foto.map(async f => ({ src: await url(f), date: f.date }))),
-    Promise.all(elenco.decoro.map(url)),
+  const [backdrop, leftMark, rightMark, photos, decor] = await Promise.all([
+    link(book.backdrop),
+    link(book.leftMark),
+    link(book.rightMark),
+    Promise.all(book.photos.map(async p => ({ src: await link(p), date: p.date }))),
+    Promise.all(book.decor.map(link)),
   ]);
 
-  const radice = document.documentElement.style;
-  radice.setProperty('--sfondo', `url("${sfondo}")`);
-  radice.setProperty('--tlou', `url("${tlou}")`);
-  radice.setProperty('--mele', `url("${mele}")`);
+  Object.entries({ backdrop, 'left-mark': leftMark, 'right-mark': rightMark })
+    .forEach(([name, url]) => document.documentElement.style.setProperty(`--${name}`, `url("${url}")`));
 
-  window.FOTO = foto;
-  window.DECORO = decoro;
-  document.title = 'S & S';
-  document.body.innerHTML = elenco.html;
-
-  const script = document.createElement('script');
-  script.src = 'app.js';
-  document.body.append(script);
+  Object.assign(window, { PHOTOS: photos, DECOR: decor });
+  document.title = book.title;
+  document.body.innerHTML = book.html;
+  document.body.append(Object.assign(document.createElement('script'), { src: 'app.js' }));
 };

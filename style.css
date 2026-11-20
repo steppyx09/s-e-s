@@ -14,7 +14,7 @@ body {
   margin: 0;
   background:
     linear-gradient(rgba(5, 8, 6, .55), rgba(5, 8, 6, .8)),
-    var(--sfondo, none) center / cover fixed,
+    var(--backdrop, none) center / cover fixed,
     var(--bg);
   color: var(--ink);
   font-family: Inter, system-ui, sans-serif;
@@ -45,13 +45,13 @@ body {
   top: 12%;
   bottom: 12%;
   width: 34%;
-  background: var(--tlou, none) center / contain no-repeat;
+  background: var(--left-mark, none) center / contain no-repeat;
   opacity: .5;
 }
 
 .hero::after {
   right: 0;
-  background-image: var(--mele, none);
+  background-image: var(--right-mark, none);
   background-position: center;
   -webkit-mask-image: linear-gradient(to left, #000 35%, transparent), linear-gradient(to bottom, #000 60%, transparent);
   -webkit-mask-composite: source-in;
@@ -59,7 +59,11 @@ body {
   mask-composite: intersect;
 }
 
-.decoro {
+.hero > * {
+  text-shadow: 0 2px 16px #000;
+}
+
+.drift {
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -67,34 +71,25 @@ body {
   pointer-events: none;
 }
 
-.decoro img {
+.drift img {
   position: absolute;
   width: min(20vw, 270px);
   opacity: 0;
   transition: opacity 1.4s ease;
-}
-
-.decoro img {
   -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
   mask-image: radial-gradient(closest-side, #000 55%, transparent);
 }
 
-.decoro img.visto { opacity: .55; }
+.drift img.seen { opacity: .55; }
 
-.crediti {
+.signature {
   padding: 0 16px 24px;
   text-align: center;
   font-size: 11px;
   color: var(--muted);
 }
 
-.crediti a {
-  color: inherit;
-}
-
-.hero > * {
-  text-shadow: 0 2px 16px #000;
-}
+.signature a { color: inherit; }
 
 .eyebrow {
   margin: 0 0 8px;
@@ -145,7 +140,7 @@ body {
   transition: outline-color .3s, box-shadow .3s;
   cursor: zoom-in;
   break-inside: avoid;
-  animation: comparsa .5s ease both;
+  animation: rise .5s ease both;
 }
 
 .photo img {
@@ -246,11 +241,62 @@ body {
 .lb-prev { left: 4px; }
 .lb-next { right: 4px; }
 
+.lock {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.lock form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(320px, 100%);
+  text-align: center;
+}
+
+.lock h1 {
+  margin: 0 0 8px;
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 300;
+  font-size: 40px;
+}
+
+.lock input,
+.lock button {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.lock input {
+  border: 1px solid #3ddc8455;
+  background: var(--card);
+  color: var(--ink);
+  text-align: center;
+}
+
+.lock button {
+  border: 0;
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.lock p {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 @keyframes fade {
   from { opacity: 0; }
 }
 
-@keyframes comparsa {
+@keyframes rise {
   from { opacity: 0; transform: translateY(12px); }
 }
 
