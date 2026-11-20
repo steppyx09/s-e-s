@@ -304,4 +304,9 @@ body {
   .album { columns: 2 140px; --gap: 8px; }
   .hero { padding: 48px 16px 28px; }
   .lb-nav { font-size: 44px; padding: 10px; }
+  .drift { z-index: 1; }
+  .drift img { width: 38vw; }
+  .drift img[style*="left:"] { margin-left: -17vw; }
+  .drift img[style*="right:"] { margin-right: -17vw; }
+  .drift img.seen { opacity: .35; }
 }
